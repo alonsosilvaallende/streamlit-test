@@ -50,8 +50,8 @@ chart = (
         color="Región:N",
     ).properties(
     	title='Total de casos confirmados acumulados*',
-		height=500,
-    	width=700
+		height=600,
+    	width=600
 	)
 )
 
