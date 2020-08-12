@@ -3,9 +3,10 @@ import pandas as pd
 import altair as alt
 import streamlit as st
 
-st.title("This is the title")
-st.markdown("This is some random **text**")
+st.title("Evolución del total de casos confirmados acumulados por región")
+st.markdown("*Advertencia*: El número de casos confirmados no representa exactamente el número de casos/contagios reales. Estos últimos valores no son conocidos por límites de testeo.")
 
+st.markdown("Datos: [Ministerio de Ciencia](https://github.com/MinCiencia/Datos-COVID19)")
 @st.cache
 def get_data():
 	URL = "https://raw.githubusercontent.com/MinCiencia/Datos-COVID19/master/output/producto3/CasosTotalesCumulativo_T.csv"
@@ -28,25 +29,32 @@ def get_data():
 df = get_data()
 
 region = st.multiselect(
-	"Choose countries", list(df.columns), ["Metropolitana", "Valparaíso"]
+	"Elegir regiones", list(df.columns), ["Metropolitana", "Valparaíso"]
 )
 #if not region:
 #    st.error("Please select at least one country.")
 #    return
 
 df = df[region]
-st.write("### Total casos confirmados acumulados", df.T)
+st.write("### Total de casos confirmados acumulados", df.T)
 df = df.reset_index()
-df = pd.melt(df, id_vars=["Region"], var_name="Región" , value_name="Casos confirmados").rename(columns={"Region": "fecha"})
+df = pd.melt(df, id_vars=["Region"], var_name="Región" , value_name="total casos confirmados").rename(columns={"Region": "fecha"})
 
 chart = (
     alt.Chart(df)
     .mark_line(opacity=0.3)
     .encode(
         x="fecha:T",
-        y=alt.Y("Casos confirmados", stack=None),
+        y=alt.Y("total casos confirmados", stack=None),
+		tooltip = ['fecha', 'total casos confirmados'],
         color="Región:N",
-    )
+    ).properties(
+    	title='Total de casos confirmados acumulados*',
+		height=500,
+    	width=700
+	)
 )
 
 st.altair_chart(chart)#, use_container_width=True)
+
+st.markdown("*El 17 de junio, se añadieron 31.422 casos confirmados debido a revisiones en el sistema de epivigilia y las fuentes de datos ([ver noticia](https://www.biobiochile.cl/noticias/nacional/chile/2020/06/16/minsal-anade-otros-31-412-contagios-covid-19-no-estaban-informados-total-supera-los-215-mil.shtml)).")
