@@ -5,7 +5,7 @@ import streamlit as st
 
 st.title("Evolución del total de casos confirmados acumulados por región")
 st.markdown("*Advertencia*: El número de casos confirmados no representa exactamente el número de casos/contagios reales. Estos últimos valores no son conocidos por límites de testeo.")
-
+st.markdown("Autor: [Alonso Silva](https://github.com/alonsosilvaallende)")
 st.markdown("Datos: [Ministerio de Ciencia](https://github.com/MinCiencia/Datos-COVID19)")
 @st.cache
 def get_data():
