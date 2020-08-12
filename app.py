@@ -42,7 +42,7 @@ df = pd.melt(df, id_vars=["Region"], var_name="Región" , value_name="total caso
 
 chart = (
     alt.Chart(df)
-    .mark_line(opacity=0.3)
+    .mark_line()
     .encode(
         x="fecha:T",
         y=alt.Y("total casos confirmados", stack=None),
@@ -51,7 +51,7 @@ chart = (
     ).properties(
     	title='Total de casos confirmados acumulados*',
 		height=600,
-    	width=600
+    	width='container'
 	)
 )
 
