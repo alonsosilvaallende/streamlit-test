@@ -51,7 +51,7 @@ chart = (
     ).properties(
     	title='Total de casos confirmados acumulados*',
 		height=600,
-    	width='container'
+    	width=600
 	)
 )
 
