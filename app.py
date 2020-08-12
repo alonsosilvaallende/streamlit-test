@@ -13,27 +13,11 @@ def get_data():
 	df = pd.read_csv(URL)
 	return df.set_index("Region")
 
-#try:
-#	df = get_data()
-#except urllib.error.URLError as e:
-#	st.error(
-#        """
-#        **This demo requires internet access.**
-#
-#        Connection error: %s
-#    """
-#		% e.reason
-#	)
-#	return
-
 df = get_data()
 
 region = st.multiselect(
 	"Elegir regiones", list(df.columns), ["Metropolitana", "Valparaíso"]
 )
-#if not region:
-#    st.error("Please select at least one country.")
-#    return
 
 df = df[region]
 st.write("### Total de casos confirmados acumulados", df.T)
@@ -55,6 +39,6 @@ chart = (
 	)
 )
 
-st.altair_chart(chart)#, use_container_width=True)
+st.altair_chart(chart)
 
 st.markdown("*El 17 de junio, se añadieron 31.422 casos confirmados debido a revisiones en el sistema de epivigilia y las fuentes de datos ([ver noticia](https://www.biobiochile.cl/noticias/nacional/chile/2020/06/16/minsal-anade-otros-31-412-contagios-covid-19-no-estaban-informados-total-supera-los-215-mil.shtml)).")
