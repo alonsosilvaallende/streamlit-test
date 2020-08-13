@@ -66,7 +66,7 @@ show_df = st.checkbox("Mostrar Tabla 1")
 if show_df:
 	st.write(df)
 
-title = "Total de casos confirmados acumulados"
+title = "Total de casos confirmados acumulados*"
 chart = my_altair_plot(df, "total casos confirmados", title)
 st.altair_chart(chart)
 
@@ -92,7 +92,7 @@ pm = st.checkbox("Promedio móvil 7 días", True)
 if pm:
 	df = df.rolling(window=7).mean()
 
-title = "Nuevos casos confirmados"
+title = "Nuevos casos confirmados*"
 chart = my_altair_plot(df, "nuevos casos confirmados", title)
 st.altair_chart(chart)
 
@@ -115,7 +115,7 @@ show_df = st.checkbox("Mostrar Tabla 3")
 if show_df:
 	st.write(df)
 
-title = "Total de casos confirmados acumulados por 100.000 habitantes"
+title = "Total de casos confirmados acumulados por 100.000 habitantes*"
 chart = my_altair_plot(df, "total casos confirmados", title)
 
 st.altair_chart(chart)
@@ -148,7 +148,7 @@ pm = st.checkbox("Suavizar/promedio móvil 7 días", True)
 if pm:
 	df = df.rolling(window=7).mean()
 
-title = "Nuevos casos confirmados por 100.000 habitantes"
+title = "Nuevos casos confirmados por 100.000 habitantes*"
 chart = my_altair_plot(df, "número de casos confirmados", title)
 
 st.altair_chart(chart)
