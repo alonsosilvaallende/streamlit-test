@@ -8,6 +8,7 @@ st.title("Evolución del total de casos confirmados acumulados por región")
 st.markdown("*Advertencia*: El número de casos confirmados no representa exactamente el número de casos/contagios reales. Estos últimos valores no son conocidos por límites de testeo.")
 st.markdown("Autor: [Alonso Silva](https://github.com/alonsosilvaallende)")
 st.markdown("Datos: [Ministerio de Ciencia](https://github.com/MinCiencia/Datos-COVID19)")
+
 @st.cache
 def get_data():
 	URL = "https://raw.githubusercontent.com/MinCiencia/Datos-COVID19/master/output/producto3/CasosTotalesCumulativo_T.csv"
@@ -26,15 +27,22 @@ region = st.multiselect(
 
 start_date = st.date_input('Fecha de inicio', df.index[0])
 end_date = st.date_input('Fecha de termino', df.index[-1])
+
 if start_date < end_date:
-    st.success('Fecha de inicio: `%s`\n\nFecha de termino: `%s`' % (start_date, end_date))
+	pass
+    #st.success('Fecha de inicio: `%s`\n\nFecha de termino: `%s`' % (start_date, end_date))
 else:
     st.error('Error: La fecha de término debe ser después de la fecha de inicio.')
 
 df = df[region].loc[start_date:end_date]
-st.write("### Total de casos confirmados acumulados", df.T)
+df = df.sort_index(ascending=False)
+
+show_df = st.checkbox("Mostrar Tabla 1")
+if show_df:
+	st.write(df)
+
 df = df.reset_index()
-df = pd.melt(df, id_vars=["fecha"], var_name="Región" , value_name="total casos confirmados")#.rename(columns={"Region": "fecha"})
+df = pd.melt(df, id_vars=["fecha"], var_name="Región" , value_name="total casos confirmados")
 
 chart = (
     alt.Chart(df)
@@ -57,16 +65,13 @@ st.markdown("*El 17 de junio, se añadieron 31.422 casos confirmados debido a re
 
 st.title("Evolución de nuevos casos confirmados por región")
 st.markdown("*Advertencia*: El número de casos confirmados no representa exactamente el número de casos/contagios reales. Estos últimos valores no son conocidos por límites de testeo.")
+
 df = get_data()
-
+# Agregar el 2 de marzo para hacer el diff
 df = df.T
-
 df[pd.to_datetime("2020-03-02")] = [0 for i in range(len(df.index))]
-
 df = df.T
-
 df = df.sort_index()
-
 df = df.diff()
 
 #region = st.multiselect(
@@ -81,9 +86,18 @@ df = df.diff()
 #    st.error('Error: La fecha de término debe ser después de la fecha de inicio.')
 
 df = df[region].loc[start_date:end_date]
-st.write("### Nuevos casos confirmados", df.T)
+show_df_new = st.checkbox("Mostrar Tabla 2")
+if show_df_new:
+	st.write(df.sort_index(ascending=False))
+
+pm = st.checkbox("Promedio móvil 7 días", True)
+if pm:
+	df = df.rolling(window=7).mean()
+
 df = df.reset_index()
+
 df = pd.melt(df, id_vars=["fecha"], var_name="Región" , value_name="nuevos casos confirmados")#.rename(columns={"Region": "fecha"})
+
 
 chart = (
     alt.Chart(df)
