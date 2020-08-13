@@ -22,7 +22,7 @@ def get_data():
 df = get_data()
 
 region = st.multiselect(
-	"Elegir regiones", list(df.columns), ["Metropolitana", "Valparaíso"]
+	"Elegir regiones", list(df.columns), ["Atacama", "Ñuble", "Magallanes"]
 )
 
 start_date = st.date_input('Fecha de inicio', df.index[0])
