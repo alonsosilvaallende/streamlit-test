@@ -87,7 +87,6 @@ elif plot == "Nuevos casos confirmados por 100.000 habitantes":
 	df = df.T
 
 df = df[region].loc[start_date:end_date]
-df = df.sort_index(ascending=False)
 
 if plot == "Total de casos confirmados acumulados":
 	st.title("Evolución del total de casos confirmados acumulados por región")
@@ -105,6 +104,7 @@ if show_df:
 pm = st.checkbox("Promedio móvil 7 días", True)
 if pm:
 	df = df.rolling(window=7).mean()
+df = df.sort_index(ascending=False)
 
 if plot == "Total de casos confirmados acumulados":
 	title = "Total de casos confirmados acumulados*"
