@@ -4,6 +4,12 @@ import altair as alt
 import streamlit as st
 import datetime
 
+st.beta_set_page_config(
+	page_title="Covid-19 Chile",
+#...     page_icon="🧊",
+	layout="wide",
+	initial_sidebar_state="expanded",
+)
 @st.cache
 def get_data():
 	URL = "https://raw.githubusercontent.com/MinCiencia/Datos-COVID19/master/output/producto3/CasosTotalesCumulativo_T.csv"
@@ -75,14 +81,14 @@ def my_streamgraph_plot(df, value_name, title):
 
 df = get_data()
 
-region = st.multiselect(
+region = st.sidebar.multiselect(
 	"Elegir regiones", list(df.columns), ["Atacama", "Ñuble", "Magallanes"]
 )
 
-start_date = st.date_input('Fecha de inicio', df.index[0])
-end_date = st.date_input('Fecha de término', df.index[-1])
+start_date = st.sidebar.date_input('Fecha de inicio', df.index[0])
+end_date = st.sidebar.date_input('Fecha de término', df.index[-1])
 if start_date > end_date:
-    st.error('Error: La fecha de término debe ser después de la fecha de inicio.')
+    st.sidebar.error('Error: La fecha de término debe ser después de la fecha de inicio.')
 
 opciones = ["Total de casos confirmados acumulados", "Total de casos confirmados acumulados por 100.000 habitantes", "Nuevos casos confirmados", "Nuevos casos confirmados por 100.000 habitantes"]
 plot = st.selectbox(
@@ -136,7 +142,7 @@ if show_df:
 	st.write(df)
 
 df = df.sort_index(ascending=True)
-pm = st.checkbox("Promedio móvil 7 días", True)
+pm = st.sidebar.checkbox("Promedio móvil 7 días", True)
 if pm:
 	df = df.rolling(window=7).mean()
 if plot == "Total de casos confirmados acumulados":
@@ -148,7 +154,7 @@ elif plot == "Nuevos casos confirmados":
 else:
 	title = "Nuevos casos confirmados por 100.000 habitantes*"
 
-option = st.radio("Tipo de gráfico", ("Normal", "Porcentaje", "Vapor"))
+option = st.sidebar.radio("Tipo de gráfico", ("Normal", "Porcentaje", "Vapor"))
 
 if option == "Normal":
 	chart = my_altair_plot(df, "casos confirmados", title)
