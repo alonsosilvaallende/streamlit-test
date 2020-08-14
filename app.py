@@ -3,6 +3,10 @@ import pandas as pd
 import altair as alt
 import streamlit as st
 import datetime
+# Nombre de meses en español
+import locale
+import calendar
+_ = locale.setlocale(locale.LC_ALL, 'es_ES')
 
 # st.beta_set_page_config(
 # 	page_title="Covid-19 Chile",
