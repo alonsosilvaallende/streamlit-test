@@ -4,12 +4,12 @@ import altair as alt
 import streamlit as st
 import datetime
 
-st.beta_set_page_config(
-	page_title="Covid-19 Chile",
-#...     page_icon="🧊",
-	layout="wide",
-	initial_sidebar_state="expanded",
-)
+# st.beta_set_page_config(
+# 	page_title="Covid-19 Chile",
+# #...     page_icon="🧊",
+# 	layout="wide",
+# 	initial_sidebar_state="expanded",
+# )
 @st.cache
 def get_data():
 	URL = "https://raw.githubusercontent.com/MinCiencia/Datos-COVID19/master/output/producto3/CasosTotalesCumulativo_T.csv"
@@ -81,9 +81,13 @@ def my_streamgraph_plot(df, value_name, title):
 
 df = get_data()
 
+options = list(df.columns) + ["Todas las regiones"]
 region = st.sidebar.multiselect(
-	"Elegir regiones", list(df.columns), ["Atacama", "Ñuble", "Magallanes"]
+	"Elegir regiones", options, ["Atacama", "Ñuble", "Magallanes"]
 )
+
+if region[0] == "Todas las regiones":
+ 	region = list(df.columns)
 
 start_date = st.sidebar.date_input('Fecha de inicio', df.index[0])
 end_date = st.sidebar.date_input('Fecha de término', df.index[-1])
