@@ -6,10 +6,11 @@ import datetime
 
 # st.beta_set_page_config(
 # 	page_title="Covid-19 Chile",
-# #...     page_icon="🧊",
+# 	page_icon="🧊",
 # 	layout="wide",
 # 	initial_sidebar_state="expanded",
 # )
+
 @st.cache
 def get_data():
 	URL = "https://raw.githubusercontent.com/MinCiencia/Datos-COVID19/master/output/producto3/CasosTotalesCumulativo_T.csv"
@@ -141,12 +142,12 @@ else:
 	st.title("Evolución de nuevos casos confirmados por 100.000 habitantes/tasa de incidencia por región")
 	
 df = df.sort_index(ascending=False)
-show_df = st.checkbox("Mostrar Tabla")
+show_df = st.checkbox("Mostrar datos")
 if show_df:
 	st.write(df)
 
 df = df.sort_index(ascending=True)
-pm = st.sidebar.checkbox("Promedio móvil 7 días", True)
+pm = st.sidebar.checkbox("Suavizar/Promedio móvil 7 días", True)
 if pm:
 	df = df.rolling(window=7).mean()
 if plot == "Total de casos confirmados acumulados":
@@ -175,4 +176,7 @@ st.markdown("Datos: [Ministerio de Ciencia](https://github.com/MinCiencia/Datos-
 
 st.markdown("*El 17 de junio, se añadieron 31.422 casos confirmados debido a revisiones en el sistema de epivigilia y las fuentes de datos ([ver noticia](https://www.biobiochile.cl/noticias/nacional/chile/2020/06/16/minsal-anade-otros-31-412-contagios-covid-19-no-estaban-informados-total-supera-los-215-mil.shtml)).")
 
-st.markdown("*Advertencia*: El número de casos confirmados no representa exactamente el número de casos/contagios reales. Estos últimos valores no son conocidos por límites de testeo. Además, los casos confirmados por 100.000 habitantes, dan mayores valores a regiones con pocos habitantes, por lo que pueden introducir sesgos en los datos.")
+if plot == "Total de casos confirmados acumulados" or plot == "Nuevos casos confirmados":
+	st.markdown("*Advertencia*: El número de casos confirmados no representa exactamente el número de casos/contagios reales. Estos últimos valores no son conocidos por límites de testeo.")
+else:
+	st.markdown("*Advertencia*: El número de casos confirmados no representa exactamente el número de casos/contagios reales. Estos últimos valores no son conocidos por límites de testeo. Además, los casos confirmados por 100.000 habitantes, dan mayores valores a regiones con pocos habitantes, por lo que pueden introducir sesgos en los datos.")
