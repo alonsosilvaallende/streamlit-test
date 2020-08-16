@@ -12,11 +12,11 @@ import casos_covid
 # streamlit run main.py    
 
 # Config
-st.beta_set_page_config(
-    page_title="Covid-19 Chile",
- 	layout="centered",
- 	initial_sidebar_state="expanded",
-)
+# st.beta_set_page_config(
+#     page_title="Covid-19 Chile",
+#  	layout="centered",
+#  	initial_sidebar_state="expanded",
+# )
 
 # Sidebar   
 st.sidebar.title('Navegación')
