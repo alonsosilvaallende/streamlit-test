@@ -84,7 +84,7 @@ def main():
 	)
 
 	if region[0] == "Todas las regiones":
-		region = list(df.columns)
+		region = list(df.drop(columns="Total").columns)
 
 	start_date = st.sidebar.date_input('Fecha de inicio', df.index[0])
 	end_date = st.sidebar.date_input('Fecha de término', df.index[-1])
