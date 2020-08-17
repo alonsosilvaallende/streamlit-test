@@ -21,7 +21,7 @@ import casos_covid
 # Sidebar   
 st.sidebar.title('Navegación')
 opt = st.sidebar.radio("",
-    ("Casos confirmados", "Defunciones Registro Civil", "Más")
+    ("Casos confirmados", "Defunciones Registro Civil", "Defunciones por causa", "Más")
 )
 
 if opt == "Defunciones Registro Civil":
@@ -29,6 +29,9 @@ if opt == "Defunciones Registro Civil":
 
 if opt == "Casos confirmados":
     casos_covid.main()
+
+if opt == "Defunciones por causa":
+    vista_deis.main()
 
 if opt == "Más":
     st.write("En construcción...")
