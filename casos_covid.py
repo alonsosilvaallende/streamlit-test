@@ -83,7 +83,10 @@ def main():
 		"Elegir regiones", options, ["Atacama", "Ñuble", "Magallanes"]
 	)
 
-	if region[0] == "Todas las regiones":
+	if len(region) == 0:
+		st.error("Por favor, ingrese una región")
+
+	if len(region) != 0 and region[0] == "Todas las regiones":
 		region = list(df.drop(columns="Total").columns)
 
 	start_date = st.sidebar.date_input('Fecha de inicio', df.index[0])
