@@ -4,12 +4,15 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import datetime
+import calendar
 
 import defunciones_registro
 import casos_covid
+import vista_deis
+import ocupacion_hospitalaria
 
 # cd Downloads\Python\Streamlit
-# streamlit run main.py    
+# streamlit run app.py    
 
 # Config
 # st.beta_set_page_config(
@@ -21,17 +24,17 @@ import casos_covid
 # Sidebar   
 st.sidebar.title('Navegación')
 opt = st.sidebar.radio("",
-    ("Casos confirmados", "Defunciones Registro Civil", "Defunciones por causa", "Más")
+    ("Casos", "Defunciones Registro Civil", "Datos Deis", "Ocupación Hospitalaria")
 )
 
 if opt == "Defunciones Registro Civil":
     defunciones_registro.main()
 
-if opt == "Casos confirmados":
+if opt == "Casos":
     casos_covid.main()
 
-if opt == "Defunciones por causa":
+if opt == "Datos Deis":
     vista_deis.main()
 
-if opt == "Más":
-    st.write("En construcción...")
+if opt == "Ocupación Hospitalaria":
+    ocupacion_hospitalaria.main()
