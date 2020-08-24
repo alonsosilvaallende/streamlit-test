@@ -7,8 +7,7 @@ import datetime
 
 @st.cache
 def get_data():
-    #url = "https://raw.githubusercontent.com/alonsosilvaallende/COVID-19/master/data/DEFUNCIONES_FUENTE_DEIS_SOLO_A%C3%91O_2020_2020-08-06.csv"
-    url = "https://raw.githubusercontent.com/joaquin-silva/covid-19-chile/master/data/data_deis_2020.csv"
+    url = "https://raw.githubusercontent.com/joaquin-silva/covid-19-chile/master/data/new_data_deis_2020.csv"
     data_2020_raw = pd.read_csv(url)
     data_2020_raw["fecha"] = pd.to_datetime(data_2020_raw["fecha"])
     data_2020_raw["mes"] = data_2020_raw["fecha"].dt.month
@@ -21,7 +20,7 @@ def get_deaths(data_2020_raw, region, mes):
     deaths = pd.DataFrame()
     deaths['edades'] = age_groups + ['Total']
     for causa in data_2020_raw['causa'].unique():
-        deaths[causa] = [len(data_2020_raw[data_2020_raw["mes"].isin(mes)].query(f'región == "{region}" & edad == "{edades}" & causa == "{causa}"')) for edades in age_groups] + [len(data_2020_raw[data_2020_raw["mes"].isin(mes)].query(f'región == "{region}" & causa == "{causa}"'))]
+        deaths[causa] = [len(data_2020_raw[data_2020_raw["mes"].isin(mes)].query(f'región == "{region}" & grupo_edad == "{edades}" & causa == "{causa}"')) for edades in age_groups] + [len(data_2020_raw[data_2020_raw["mes"].isin(mes)].query(f'región == "{region}" & causa == "{causa}"'))]
     deaths = deaths.set_index('edades')
 
     deaths_percentage = deaths.apply(lambda x: 100*x/deaths.sum(axis=1))
@@ -56,7 +55,7 @@ def my_plot(df, region):
 
 def deaths_genre_plot(df):
     df = df[df['causa']=='COVID-19']
-    grouped = df.groupby(["género","edad"])
+    grouped = df.groupby(["género","grupo_edad"])
     l_genero = []
     l_edad = []
     l_def = []
@@ -64,11 +63,6 @@ def deaths_genre_plot(df):
         l_genero.append(name[0])
         l_edad.append(name[1])
         l_def.append(group.shape[0])
-
-    if len(l_genero) < 42:
-        l_genero.append("Hombre")
-        l_edad.append("5 a 9")
-        l_def.append(0)
 
     data_deis_grouped = pd.DataFrame({"genero":l_genero,"edad":l_edad,"fallecidos":l_def})
 
@@ -101,7 +95,7 @@ def my_groupby(data):
     df['causa'] = [causa[:37] for causa in df['causa']]
     return df
 
-def my_plot_2(df):
+def my_plot_2(df, op):
     df = df.sort_values(by=['causa']).reset_index(drop=True)
     flatui = ['#d62728','#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c', '#98df8a', '#ff9896', '#9467bd', '#c5b0d5', '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f', '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
     fig = go.Figure()
@@ -109,32 +103,89 @@ def my_plot_2(df):
     for i, causa in enumerate(causas):
         aux = df[df['causa']==causa]
         aux = aux.sort_values(by=['fecha']).reset_index(drop=True)
-        aux['media movil'] =  aux['cantidad'].rolling(7).mean()
+        if op:
+            y =  aux['cantidad'].rolling(7).mean()
+        else:
+            y = aux['cantidad']
         fig.add_trace(go.Scatter(
             x=aux['fecha'],
-            y=aux['media movil'],
+            y=y,
             name=str(causa),
             mode='lines',
             marker_color=flatui[i],
         ))
-        fig.update_layout(
-        title_text="Defunciones por causa básica",
+    fig.update_layout(
+    title_text="Defunciones por causa básica",
+    xaxis_title="Fecha",
+    yaxis_title="Defunciones"
+    )
+    return fig
+
+@st.cache
+def my_groupby_2(data):
+    df = data.groupby(['fecha','región','causa_detalle'], as_index=False).count()
+    df = df[df.columns[:4]]
+    df = df.rename(columns={'año':'cantidad'})
+    df = df.sort_values(by=['fecha']).reset_index(drop=True)
+    return df
+
+@st.cache
+def my_groupby_3(data):
+    df = data.groupby(['fecha','causa_detalle'], as_index=False).count()
+    df = df[df.columns[:3]]
+    df = df.rename(columns={'año':'cantidad'})
+    df = df.sort_values(by=['fecha']).reset_index(drop=True)
+    return df
+
+def my_plot_3(df):
+    colors = ['#1f77b4','#d62728']
+    fig = go.Figure()
+    causas = list(set(df['causa_detalle']))
+    names = ['Covid-19, sospechoso', 'Covid-19, confirmado']
+    for i, causa in enumerate(causas):
+        aux = df[df['causa_detalle']==causa]
+        aux = aux.sort_values(by=['fecha']).reset_index(drop=True)
+        fig.add_trace(go.Bar(
+            x=aux['fecha'],
+            y=aux['cantidad'],
+            name=names[i],
+            marker_color=colors[i],
+        ))
+
+    fig.update_layout(
+        title_text="Defunciones Covid-19 confirmado y sospechoso",
+        barmode="stack",
         xaxis_title="Fecha",
         yaxis_title="Defunciones"
-        )
-
+    )
     return fig
 
 def main():
-    st.title('Porcentaje de defunciones por causa básica de muerte')
-
     df = get_data()
+    df_covid = df[df["causa"]=='COVID-19'].reset_index(drop=True)
 
     st.sidebar.markdown('---')
     regiones = list(set(df['región']))
     regiones.remove('Ignorada')
-    reg = st.sidebar.selectbox('Elegir Región', regiones, key=0)
+    reg = st.sidebar.selectbox('Elegir Región', regiones, key=0, index=regiones.index('Metropolitana de Santiago'))
     df_reg = df[df['región']==reg]
+
+    st.title('Defunciones Covid-19 por fecha')
+
+    st.header('Gráfico Nacional')
+    group = my_groupby_3(df_covid)
+    fig = my_plot_3(group)
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.header(f'Gráfico Región {reg}')
+    group = my_groupby_2(df_covid)
+    df_reg_covid = group[group['región']==reg]
+
+    fig = my_plot_3(df_reg_covid)
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown('---')
+    st.title('Porcentaje de defunciones por causa básica de muerte')
 
     meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto']
     mes = st.multiselect('Elegir meses', meses, ['Junio','Julio'])
@@ -168,7 +219,8 @@ def main():
     group = my_groupby(df)
     df_reg = group[group['región']==reg]
 
-    fig = my_plot_2(df_reg)
+    op = st.checkbox("Suavizar datos (Promedio móvil 7 días)", value=True)
+    fig = my_plot_2(df_reg, op)
     st.plotly_chart(fig, use_container_width=True)
 
     if st.checkbox("Mostrar datos", value=False, key=1): 
