@@ -65,7 +65,7 @@ def main():
     st.header('Vista regional')
     
     df = get_data_reg()
-    l_reg = list(set(df['Region']))
+    l_reg = list(df['Region'].dropna().unique())
     regiones = st.multiselect('Regiones', l_reg, l_reg, key=0)
 
     op = st.checkbox("Suavizar datos (Promedio móvil 7 días)", value=True, key=0)
@@ -75,11 +75,11 @@ def main():
     st.header('Vista comunal')
 
     df = get_data_comuna()
-    regiones = list(set(df['Region']))
+    regiones = list(df['Region'].dropna().unique())
     reg = st.selectbox('Region', regiones, index=regiones.index('Metropolitana'))
     df_reg = df[df['Region']==reg].reset_index(drop=True)
 
-    l_comunas = list(set(df_reg['Comuna']))
+    l_comunas = list(df_reg['Comuna'].dropna().unique())
     comunas = st.multiselect('Comunas', l_comunas, l_comunas, key=1)
 
     op = st.checkbox("Suavizar datos (Promedio móvil 7 días)", value=True, key=1)
