@@ -29,10 +29,17 @@ def get_data():
 	df["date"] = df["date"].astype('int64')
 	df = pd.concat([df[df["country"]=="Chile"],df[df["country"]!="Chile"]], ignore_index=True)
 	return df
+
 df = get_data()
+texts = st.checkbox("Mostrar nombres de los países")
+if texts:
+	text="country"
+else:
+	text=None
 fig = px.scatter(df,
                 x='GDP per capita (constant 2010 US$)',
                 y='Gini Index',
+				text=text,
                 animation_frame="date",
                 animation_group="country",
                 size="Population",
@@ -45,3 +52,7 @@ fig = px.scatter(df,
 				title="Índice de Gini vs PIB per cápita"
                 )
 st.plotly_chart(fig)
+# with st.expander("See explanation"):
+# 	st.write("""
+# 			La siguiente es la explicación
+# 	""")
