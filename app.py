@@ -52,6 +52,8 @@ fig = px.scatter(df,
 				title="Índice de Gini vs PIB per cápita"
                 )
 st.plotly_chart(fig)
+st.write("Elaboración propia en base a datos del Banco Mundial")
+st.write("Autor: Alonso Silva")
 # with st.expander("See explanation"):
 # 	st.write("""
 # 			La siguiente es la explicación
