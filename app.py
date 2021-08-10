@@ -22,10 +22,10 @@ def get_data():
 	df = pd.DataFrame()
 	for country in data["country"].unique():
 	    if data[data["country"]==country]['Gini Index'].notna().sum() != 0 and data[data["country"]==country]['GDP per capita (constant 2010 US$)'].notna().sum() != 0:
-	        df_aux = data[data["country"]==country].fillna(method="bfill").dropna()
-	        df_aux["Region"]=[df_region.loc[country].values[0] for i in range(len(df_aux))]
-	        df_aux=df_aux.sort_values(by="date")
-	        df = pd.concat([df, df_aux], ignore_index=True)
+	        df_auxiliar = data[data["country"]==country].fillna(method="bfill").dropna()
+	        df_auxiliar["Region"]=[df_region.loc[country].values[0] for i in range(len(df_auxiliar))]
+	        df_auxiliar=df_auxiliar.sort_values(by="date")
+	        df = pd.concat([df, df_auxiliar], ignore_index=True)
 	df["date"] = df["date"].astype('int64')
 	df = pd.concat([df[df["country"]=="Austria"],df[df["country"]!="Austria"]], ignore_index=True)
 	df = pd.concat([df[df["country"]=="Algeria"],df[df["country"]!="Algeria"]], ignore_index=True)
@@ -37,11 +37,12 @@ def get_data():
 	return df
 
 df = get_data()
-option = st.multiselect('Elige regiones de interes', df["Region"].unique().tolist(), df["Region"].unique().tolist())
-selected = st.multiselect('Elige países de interés', ['Todos']+df["country"].unique().tolist())
+df_wb = df.copy()
+option = st.multiselect('Elige regiones de interes', df_wb["Region"].unique().tolist(), df_wb["Region"].unique().tolist())
+selected = st.multiselect('Elige países de interés', ['Todos']+df_wb["country"].unique().tolist())
 df_aux = pd.DataFrame()
 for i,region in enumerate(option):
-	df_aux = pd.concat([df_aux, df[df["Region"]==option[i]]], ignore_index=True)
+	df_aux = pd.concat([df_aux, df_wb[df_wb["Region"]==option[i]]], ignore_index=True)
 if len(df_aux) == 0:
 	st.error("Por favor, ingrese una región")
 else:
@@ -49,7 +50,7 @@ else:
 	if len(selected) != 0:
 		for i, cntry in enumerate(selected):
 			if selected[i] == 'Todos':
-				selected = df["country"].unique().tolist()
+				selected = df_wb["country"].unique().tolist()
 	for selection in selected:
 		df_aux.loc[df_aux.index[df_aux["country"]==f"{selection}"].tolist(), "selected country"] = f"{selection}"
 	fig = px.scatter(df_aux,
