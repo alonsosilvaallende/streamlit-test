@@ -27,34 +27,48 @@ def get_data():
 	        df_aux=df_aux.sort_values(by="date")
 	        df = pd.concat([df, df_aux], ignore_index=True)
 	df["date"] = df["date"].astype('int64')
+	df = pd.concat([df[df["country"]=="Austria"],df[df["country"]!="Austria"]], ignore_index=True)
+	df = pd.concat([df[df["country"]=="Algeria"],df[df["country"]!="Algeria"]], ignore_index=True)
+	df = pd.concat([df[df["country"]=="Botswana"],df[df["country"]!="Botswana"]], ignore_index=True)
+	df = pd.concat([df[df["country"]=="Australia"],df[df["country"]!="Australia"]], ignore_index=True)
+	df = pd.concat([df[df["country"]=="India"],df[df["country"]!="India"]], ignore_index=True)
+	df = pd.concat([df[df["country"]=="United States"],df[df["country"]!="United States"]], ignore_index=True)
 	df = pd.concat([df[df["country"]=="Chile"],df[df["country"]!="Chile"]], ignore_index=True)
 	return df
 
 df = get_data()
-texts = st.checkbox("Mostrar nombres de los países")
-if texts:
-	text="country"
+option = st.multiselect('Elige regiones de interes', df["Region"].unique().tolist(), df["Region"].unique().tolist())
+selected = st.multiselect('Elige países de interés', ['Todos']+df["country"].unique().tolist())
+df_aux = pd.DataFrame()
+for i,region in enumerate(option):
+	df_aux = pd.concat([df_aux, df[df["Region"]==option[i]]], ignore_index=True)
+if len(df_aux) == 0:
+	st.error("Por favor, ingrese una región")
 else:
-	text=None
-fig = px.scatter(df,
-                x='GDP per capita (constant 2010 US$)',
-                y='Gini Index',
-				text=text,
-                animation_frame="date",
-                animation_group="country",
-                size="Population",
-                color="Region",
-                hover_name="country",
-                log_x=True,
-                size_max=60,
-				labels={"Gini Index":"Índice de Gini",
- "GDP per capita (constant 2010 US$)":"PIB per cápita (dólares ajustados por inflación a valor 2010) (escala log)"},
-				title="Índice de Gini vs PIB per cápita"
-                )
-st.plotly_chart(fig)
-st.write("Elaboración propia en base a datos del Banco Mundial")
-st.write("Autor: Alonso Silva")
-# with st.expander("See explanation"):
-# 	st.write("""
-# 			La siguiente es la explicación
-# 	""")
+	df_aux["selected country"] = ['' for i in range(len(df_aux))]
+	if len(selected) != 0:
+		for i, cntry in enumerate(selected):
+			if selected[i] == 'Todos':
+				selected = df["country"].unique().tolist()
+	for selection in selected:
+		df_aux.loc[df_aux.index[df_aux["country"]==f"{selection}"].tolist(), "selected country"] = f"{selection}"
+	fig = px.scatter(df_aux,
+	                x='GDP per capita (constant 2010 US$)',
+	                y='Gini Index',
+					text='selected country',
+	                animation_frame="date",
+	                animation_group="country",
+	                size="Population",
+	                color="Region",
+	                hover_name="country",
+	                log_x=True,
+	                size_max=60,
+					range_x=[df_aux['GDP per capita (constant 2010 US$)'].min(),df_aux['GDP per capita (constant 2010 US$)'].max()],
+					range_y=[df_aux['Gini Index'].min(), df_aux['Gini Index'].max()],
+					labels={"Gini Index":"Índice de Gini",
+	 "GDP per capita (constant 2010 US$)":"PIB per cápita (dólares ajustados por inflación a valor 2010) (escala log)"},
+					title="Índice de Gini vs PIB per cápita"
+	                )
+	st.plotly_chart(fig)
+	st.write("Elaboración propia en base a datos del Banco Mundial")
+	st.write("Autor: Alonso Silva")
